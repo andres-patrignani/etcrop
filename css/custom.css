@@ -1,0 +1,48 @@
+nav{
+ background-color: #37474f;
+}
+
+#camera-btn{
+  background-color:rgb(237, 125, 49);
+  margin-left: 20px;
+  font-weight: 600;
+}
+
+#landing{
+  height: 100%;
+}
+
+#location{
+  margin-top: 25px;
+}
+
+.location-label{
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+#dashboard{
+  margin-top: 25px;
+}
+
+.dashboard-value{
+  margin-top: 5px;
+  color: tomato;
+  font-size: calc(60px + 0.10 * 50vw);
+
+}
+
+.dashboard-label{
+  margin-bottom: 1px;
+  color: rgb(117, 117, 117);
+}
+
+img{
+  max-width: 100%;
+  max-height: 100%;
+  display: block; /* remove extra space below image */
+}
+
+table{
+  border: none;
+}
