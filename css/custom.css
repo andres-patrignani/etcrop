@@ -38,6 +38,8 @@ nav{
 }
 
 img{
+  width: 100%;
+  height: auto;
   max-width: 100%;
   max-height: 100%;
   display: block; /* remove extra space below image */
@@ -45,4 +47,16 @@ img{
 
 table{
   border: none;
+}
+
+#landing-image{
+  width: 100%;
+  padding-top: 25vh;
+}
+
+@media screen and (min-width: 800px) {
+  #landing-image {
+    padding-left: 15vw;
+    padding-right: 15vw;
+  }
 }
