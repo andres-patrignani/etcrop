@@ -91,22 +91,18 @@
         <div class="modal-content">
         <h4>About</h4>
         <p>
-            ETcrop is a web-based application for estimating the evapotranspiration demand of common agricultural crops. 
-            The application was develop in an effort to help water managers and producers to quickly estimate the the water need of
-            irrigated crops. The tool is not a substitute for other technologies such as soil moisture sensors and
-            decision-support tools. 
+            <i>ETcrop</i> is a simple application for estimating the evapotranspiration demand of common agricultural crops. 
+            The application was develop in an effort to help water managers and producers to quickly estimate the water needs of
+            irrigated crops.
 
             <h5>How it works</h5>
-            Crop evapotranspiration is estimated by first computing the daily short-grass reference evapotranspiration 
-            and then by estimating a crop coefficient based on canopy cover. Recent studies show that canopy cover
-            can be effectively used to track crop growth and is tighly related to crop coefficients.
-
-            Reference evapotrasnpiration is estimated using a temperature and humidity mode. This models is a simplified
-            version of the well-known Penman-Monteith model and we made this decision to favor widely available 
-            meteorological variables.
+            Crop evapotranspiration is estimated as the product between daily reference evapotranspiration 
+            and a crop coefficient. Reference evapotranspiration is computed using a mass-transfer model and the
+            crop coefficient is approximated using green canopy cover. Recent research studies are consistently showing
+             that canopy cover can be effectively used as a proxy to track crop growth and crop coefficients.
 
             <h5>References</h5>
-            The ETcrop web-app is based on the following peer-reviewed studies:
+            The <i>ETcrop</i> web-app was built on concepts described in the following peer-reviewed studies:
 
             <ul>
                 <li>Patrignani, A. and Ochsner, T.E., 2015. Canopeo: A powerful new tool for measuring fractional green canopy cover. Agronomy Journal, 107(6), pp.2312-2320.</li>
@@ -129,11 +125,15 @@
         <div class="modal-content">
         <h4>Instructions</h4>
         <p>
-            Using ETcrop is fairly simple. Just wait until the status of the web-app says "Ready" and then proceed
-            to take a downward-facing image of the crop. The web-app will automatically compute the reference evapotranspiration,
-            the green canopy cover, the crop coefficient, and the evapotranspiration of the crop (crop water demand).
+            Using <i>ETcrop</i> is fairly simple. Just wait few seconds until the web-app has fully loaded (Status: Ready).
+            Then proceed to take a downward-facing image of the crop, make sure you keep the camera lens at least 2 or 3 feet from the top of the canopy. 
+            The web-app will automatically compute the reference evapotranspiration, green canopy cover, crop coefficient, and crop evapotranspiration.
+            The resulting crop evapotranspiration in mm per day will give you an estimate of the irrigation needs. To provide
+            you with more information <i>ETcrop</i> also reports the date, time, and geographic coordinates of each picture.
+            The accuracy of the location depends on the GPS onboard of your mobile device.
 
-            If you left the ETcrop app open and moved to a new location several miles apart, we suggest that you refresh your 
+            To ensure a better user experience weather data is only retrieved when you open the app or refresh the web browser. 
+            If you move to a new location several miles apart from your initial position, we suggest that you refresh your 
             browser to obtain weather data from the nearest monitoring station.
         </p>
         </div>
