@@ -200,7 +200,8 @@ function dalton(){
 
 function openweathermap(){
     let dt = parseInt(( (new Date().getTime() - 24*60*60*1000) / 1000).toFixed(0));
-    let URL = "http://api.openweathermap.org/data/2.5/onecall/timemachine?lat=" + userLocation.latitude + "&lon=" + userLocation.longitude + "&dt=" + dt + "&appid=99fe4ecff5e236e5a687ccc63fd1a7c4";
+    let URL = "https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=" + userLocation.latitude + "&lon=" + userLocation.longitude + "&dt=" + dt + "&appid=99fe4ecff5e236e5a687ccc63fd1a7c4";
+    console.log(URL)
     weather = loadJSON(URL, dalton)
 }
 
