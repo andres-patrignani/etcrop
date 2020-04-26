@@ -28,7 +28,7 @@ nav{
 .dashboard-value{
   margin-top: 5px;
   color: tomato;
-  font-size: calc(60px + 0.10 * 50vw);
+  font-size: calc(50px + 5vw);
 
 }
 
