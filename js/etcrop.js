@@ -180,7 +180,7 @@ function dalton(){
         let RH = weather.hourly[i].humidity
         let W = weather.hourly[i].wind_speed;
 
-        // Compute vapor pressur deficit for each hour
+        // Compute vapor pressure deficit for each hour
         let es = 0.6108 * Math.exp(17.27 * (T) / (T + 237.3));
         let ea = es * (RH/100);
         let vpd = es - ea;
