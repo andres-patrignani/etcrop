@@ -223,6 +223,13 @@ function etcropfn(cc){
 
 function gotFile(file) {
     if (file.type === 'image'){
+
+        // Remove current images on display (if any)
+        if(document.getElementById('original-image').querySelector('img')){
+            document.getElementById('original-image').querySelector('img').remove();
+            document.getElementById('classified-image').querySelector('img').remove()
+        }
+
         loadImage(file.data,function(imgOriginal){
             getCurrentPosition(); //update recent location to the local storage. 
 
@@ -270,8 +277,9 @@ function gotFile(file) {
                     }
                 }
             }
-
             imgClassified.updatePixels();
+
+            // Compute percent green canopy cover
             percentCanopyCover = greenPixels/(imgClassified.width * imgClassified.height)*100;
 
             // Compute ET crop
@@ -290,7 +298,7 @@ function gotFile(file) {
 
             // Add dashboard original image
             dashboardOriginalImage = createImg(imgOriginal.canvas.toDataURL(),'original image');
-            dashboardOriginalImage.parent('orignal-image');
+            dashboardOriginalImage.parent('original-image');
 
             // Add dashboard classified image
             dashboardClassifiedImage = createImg(imgClassified.canvas.toDataURL(),'classified image');
@@ -299,12 +307,12 @@ function gotFile(file) {
             // Hide landing
             landing.style.display = "none";
             
-             // Displaying the result grid 
-             info.style.visibility = 'visible';
-             info.style.display = 'block';
+            // Displaying the result grid 
+            info.style.visibility = 'visible';
+            info.style.display = 'block';
  
-             dashboard.style.visibility = 'visible';
-             dashboard.style.display = "block";
+            dashboard.style.visibility = 'visible';
+            dashboard.style.display = "block";
 
         });
 
