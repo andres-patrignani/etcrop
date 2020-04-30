@@ -23,6 +23,11 @@ var cameraUpload;
 
 function preload() {
     //stations = loadTable('data/stations.csv','csv','header');
+
+    // Get date and time
+    currentDateTime = new Date();
+
+    // Get location
     if(geoCheck() == true){
         userLocation =  getCurrentPosition(openweathermap);
 	}else{
@@ -31,23 +36,32 @@ function preload() {
 }
 
 
-
 function setup() {
     noCanvas();
 
     // Display running version
     console.log('Running etcrop v1.0')
 
-    // Get date and time
-    currentDateTime = new Date();
+    // Save Location and DateTime to local storage
+    localStorage.setItem('user-last-latitude', userLocation.latitude);
+    localStorage.setItem('user-last-longitude', userLocation.longitude)
+    localStorage.setItem('user-last-datetime', currentDateTime)
+    
+    if(localStorage.getItem('user-units')){
+        localStorage.setItem('user-units', 'metric')
+    }
 
     // Camera button
     cameraBtn = document.getElementById('camera-btn');
     cameraUpload = createFileInput(gotFile);
     cameraUpload.parent("camera-btn");
+    cameraUpload.elt.addEventListener('click', updateweather, true)
     cameraBtn.children[0].style.display = "none"
-    
 
+    // USer data table
+    dataTableBtn = document.getElementById('data-table-btn');
+    dataTableBtn.addEventListener('click', updatedatatable)
+    
     // Landing
     landing = document.getElementById('landing');
 
@@ -60,8 +74,8 @@ function setup() {
     // Dashboard components
     latitudeContainer = document.getElementById('latitude-value');
     longitudeContainer = document.getElementById('longitude-value');
-    datetimeContainer = document.getElementById('datetime-value');
-    statusContainer = document.getElementById('status-value');
+    dateContainer = document.getElementById('date-value');
+    timeContainer = document.getElementById('time-value');
 
     //nearestStationNameContainer = document.getElementById('nearest-station-name');
     //nearestStationDistanceContainer = document.getElementById('nearest-station-distance');
@@ -80,11 +94,14 @@ function setup() {
     // Set datetime and location dashboard values
     latitudeContainer.innerText = userLocation.latitude.toFixed(6);
     longitudeContainer.innerText = userLocation.longitude.toFixed(6);
-    datetimeContainer.innerText = currentDateTime.toLocaleString();
-    statusContainer.innerText = "Ready"
+    dateContainer.innerText = currentDateTime.toLocaleDateString();
+    timeContainer.innerText = currentDateTime.toLocaleTimeString();
+
+    //statusContainer.innerText = "Ready"
     //nearestStationNameContainer.innerText = nearestStationName;
     //nearestStationDistanceContainer.innerText = Math.round(nearestStationDistance*100)/100;
     info.style.display = "block";
+
 }
 
 
@@ -110,7 +127,6 @@ function findNearestStation(){
     nearestStationName = stations.get(idxNearest,"NAME");
     nearestStationDistance = stations.get(idxNearest,"DISTANCE")
     console.log('Done finding nearest station')
-
 }
 
 function requestNearestStationData(){
@@ -142,27 +158,25 @@ function requestNearestStationData(){
     weather = loadTable(URL,'csv','header');
 }
 
-
-
-function romanenko(){
-    // Proposed by Romanenko in 1961
-
-    // Compute sum of weather variables
-    let TempSum = 0;
-    let RHSum = 0;
-
-    let N = weather.hourly.length;
-    for(let i=0; i<N; i++){
-        TempSum += (weather.hourly[i].temp - 273.15);
-        RHSum += weather.hourly[i].humidity;
+function updatedatatable(){
+    document.getElementById("data-table").innerHTML = ""
+    if(localStorage.getItem('user-data')){
+        let userData = JSON.parse(localStorage.getItem('user-data'));
+        for(let i=userData.length-1; i>=0; i--){
+            let rowDate = new Date(userData[i].datetime);
+            createElement('tbody',
+                        "<td> Date: " + rowDate.toLocaleDateString() + "</br> Time: " + rowDate.toLocaleTimeString() + "</td>" +
+                        "<td> Lat: " + userData[i].lat.toFixed(6) + 
+                            "</br> Lon: " + userData[i].lon.toFixed(6) +
+                            "</br> ETref: " + userData[i].etref.toFixed(2) + 
+                            "</br> ETcrop: " + userData[i].etcrop.toFixed(2) +
+                            "</br> Kcb: " + userData[i].cropCoefficient.toFixed(2) +
+                            "</br> CC: " + userData[i].percentCanopyCover.toFixed(1) +
+                        "</td>").parent('data-table');
+        }
+    } else {
+        createElement('div',"No data available. Take some pictures.").parent('data-table');
     }
-
-    // Compute mean temperature and relative humidity
-    let TempMean = TempSum/N
-    let RHMean = RHSum/N
-
-    // Calculate reference ET using the Romanenko method with custom parameters (temperature-based method)
-    etref = 0.000055*(27.2+TempMean)**2 * (100-RHMean);
 }
 
 function dalton(){
@@ -195,7 +209,13 @@ function dalton(){
     let vpdMean = vpdSum/N
 
     // Calculate reference ET using Dalton's method (mass transfer method)
-    etref = (2.6 + 0.30*windSpeedMean)*vpdMean; //(5.3 0.07)
+    etref = (2.98 + 0.38*windSpeedMean) * vpdMean**0.69; // grass
+    etref = Math.min(etref, 18);
+    etref = Math.max(etref, 0.15);
+
+    //etref = (3.34 + 0.77*windSpeedMean) * vpdMean**0.69; // alfalfa
+
+    M.toast({html: 'Weather is ready!', 'displayLength':2000, inDuration: 500})
 }
 
 function openweathermap(){
@@ -205,7 +225,21 @@ function openweathermap(){
 }
 
 
-function dayOftheYear(){
+function updateweather(){
+    let lat1 = userLocation.latitude;
+    let lon1 = userLocation.longitude;
+    let lat2 = float(localStorage.getItem('user-last-latitude'));
+    let lon2 = float(localStorage.getItem('user-last-longitude'));
+    let timeChange = (currentDateTime.getTime() - new Date(localStorage.getItem('user-last-datetime')).getTime())/86400000;
+    let distanceChange = haversine(lat1,lon1,lat2,lon2);
+
+    if(distanceChange > 2 || timeChange >= 1){
+        M.toast({html: 'Getting new weather', 'displayLength':1500, completeCallback: openweathermap})
+    }
+}
+
+
+function dayofyear(){
     var today = new Date();
     var start = new Date(today.getFullYear(), 0, 0); // Constructing the Jan 1 for the given year
     var diff = today - start; // time differnece by second
@@ -216,13 +250,65 @@ function dayOftheYear(){
 
 
 function etcropfn(cc){
-    cropCoefficient = (1.1 * (cc/100) + 0.17);
+    if(cc >= 0 && cc <= 80){
+        cropCoefficient = 0.17 + 1.225 * (cc/100); // grass
+        //cropCoefficient = 0.17 + 1.1 * (cc/100); // alfalfa
+    } else {
+        cropCoefficient = 1.05;
+    }
     etcrop = etref * cropCoefficient;
 }
 
 
+function haversine(lat1,lon1,lat2,lon2) {
+    // convert degrees to radians
+    let dLat = (lat2 - lat1) * Math.PI / 180;  
+    let dLon = (lon2 - lon1) * Math.PI / 180;  
+
+    // Earth radius in kilometers
+    let  earthRadius = (6356.752 + 6378.137)/2
+
+    // haversine
+    let h  =  Math.sin(dLat / 2)**2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2)**2;
+    h = Math.min(h,1) // Prevent values greater than 1 due to floating point error.
+
+    // Compute distance
+    let d   = 2 * earthRadius * Math.asin(Math.sqrt(h)); // distance in kilometers
+
+    return d
+}
+
+
+function storeuserdata(name,value) {
+
+	// Get the existing data
+	var existing = localStorage.getItem(name);
+
+	// Create new array or convert the localStorage string to an array
+    if(existing){
+        existing = JSON.parse(existing);
+    }else{
+        existing = [];
+    }
+
+	// Add new data to localStorage Array
+    existing.push(value);
+    
+    // Trim older data
+    let N = 10;
+    if(existing.length > N){
+        existing = existing.splice(-N);
+    }
+
+	// Save back to localStorage
+	localStorage.setItem(name, JSON.stringify(existing));
+};
+
+
 function gotFile(file) {
     if (file.type === 'image'){
+
+        updateweather()
 
         // Remove current images on display (if any)
         if(document.getElementById('original-image').querySelector('img')){
@@ -288,7 +374,8 @@ function gotFile(file) {
             // Update location values
             latitudeContainer.innerText = userLocation.latitude.toFixed(6);
             longitudeContainer.innerText = userLocation.longitude.toFixed(6);
-            datetimeContainer.innerText = currentDateTime.toLocaleString();
+            dateContainer.innerText = currentDateTime.toLocaleDateString();
+            timeContainer.innerText = currentDateTime.toLocaleTimeString();
 
             // Update dashboard values
             canopyCoverContainer.innerText = percentCanopyCover.toFixed(1);
@@ -303,6 +390,17 @@ function gotFile(file) {
             // Add dashboard classified image
             dashboardClassifiedImage = createImg(imgClassified.canvas.toDataURL(),'classified image');
             dashboardClassifiedImage.parent('classified-image');
+
+            // Save to local storage
+            storeuserdata('user-data',{
+                'datetime': currentDateTime.getTime(),
+                'lat': userLocation.latitude, 
+                'lon': userLocation.longitude, 
+                'etref': etref,
+                'etcrop': etcrop,
+                'percentCanopyCover': percentCanopyCover, 
+                'cropCoefficient': cropCoefficient
+            });
 
             // Hide landing
             landing.style.display = "none";

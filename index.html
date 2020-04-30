@@ -25,6 +25,7 @@
             <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
            <label class="btn btn-primary" id="camera-btn">Load Image</label>
             <ul class="right hide-on-med-and-down">
+                <li><a class="modal-trigger" href="#modal-table" id="data-table-btn">Table</a></li>
                 <li><a class="modal-trigger" href="#modal-about">About</a></li>
                 <li><a class="modal-trigger" href="#modal-instructions">Instructions</a></li>
                 <li><a href="https://github.com/andres-patrignani/etcrop">Github</a></li>
@@ -34,6 +35,7 @@
 
     <!-- Side navigation bar in small screens-->
     <ul class="sidenav" id="mobile-nav">
+        <li><a class="modal-trigger" href="#modal-table">Table</a></li>
         <li><a class="modal-trigger" href="#modal-about">About</a></li>
         <li><a class="modal-trigger" href="#modal-instructions">Instructions</a></li>
         <li><a href="https://github.com/andres-patrignani/etcrop">Github</a></li>
@@ -44,10 +46,10 @@
         <table>
             <tbody>
                 <tr>
-                    <td>DateTime: <span id="datetime-value">...</span></td>
+                    <td>Date: <span id="date-value">...</span></td>
+                    <td>Time: <span id="time-value">...</span></td>
                     <td>Latitude: <span id="latitude-value">...</span></td>
                     <td>Longitude: <span id="longitude-value">...</span></td>
-                    <td>Status: <span id="status-value">Loading</span></td>
                 </tr>
             </tbody>
         </table>
@@ -151,10 +153,21 @@
         </div>
     </div>
 
+     <!-- History Table-->
+     <div id="modal-table" class="modal">
+        <div class="modal-content">
+            <table id="data-table" class="table-responsive">
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+        </div>
+    </div>
+
     <script src="js/p5/p5.min.js"></script>
     <script src="js/p5geolocation/p5.geolocation.js"></script>
     <script type="text/javascript" src="js/materialize.min.js"></script>
-    <script src="js/etcrop.js"></script>
+    <script src="js/etcrop_v1.0.js"></script>
     <script>
         //Sidenav
         document.addEventListener('DOMContentLoaded', function() {
