@@ -60,3 +60,7 @@ table{
     padding-right: 15vw;
   }
 }
+
+.toast-warning{
+  background-color: tomato;
+}

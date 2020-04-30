@@ -41,15 +41,7 @@ function setup() {
 
     // Display running version
     console.log('Running etcrop v1.0')
-
-    // Save Location and DateTime to local storage
-    localStorage.setItem('user-last-latitude', userLocation.latitude);
-    localStorage.setItem('user-last-longitude', userLocation.longitude)
-    localStorage.setItem('user-last-datetime', currentDateTime)
     
-    if(localStorage.getItem('user-units')){
-        localStorage.setItem('user-units', 'metric')
-    }
 
     // Camera button
     cameraBtn = document.getElementById('camera-btn');
@@ -95,12 +87,16 @@ function setup() {
     latitudeContainer.innerText = userLocation.latitude.toFixed(6);
     longitudeContainer.innerText = userLocation.longitude.toFixed(6);
     dateContainer.innerText = currentDateTime.toLocaleDateString();
-    timeContainer.innerText = currentDateTime.toLocaleTimeString();
+    timeContainer.innerText = currentDateTime.toLocaleTimeString('en-US', { hour12: false });
 
     //statusContainer.innerText = "Ready"
     //nearestStationNameContainer.innerText = nearestStationName;
     //nearestStationDistanceContainer.innerText = Math.round(nearestStationDistance*100)/100;
     info.style.display = "block";
+
+    localStorage.setItem('user-last-latitude', userLocation.latitude);
+    localStorage.setItem('user-last-longitude', userLocation.longitude)
+    localStorage.setItem('user-last-datetime', currentDateTime);
 
 }
 
@@ -159,16 +155,18 @@ function requestNearestStationData(){
 }
 
 function updatedatatable(){
-    document.getElementById("data-table").innerHTML = ""
+    document.getElementById("data-table").innerHTML = "";
+
     if(localStorage.getItem('user-data')){
         let userData = JSON.parse(localStorage.getItem('user-data'));
+        createElement('tr', "<th>DateTime</th><th>Position</th><th>Metrics</th>").parent('data-table');
+        
         for(let i=userData.length-1; i>=0; i--){
             let rowDate = new Date(userData[i].datetime);
-            createElement('tbody',
+            createElement('tr',
                         "<td> Date: " + rowDate.toLocaleDateString() + "</br> Time: " + rowDate.toLocaleTimeString() + "</td>" +
-                        "<td> Lat: " + userData[i].lat.toFixed(6) + 
-                            "</br> Lon: " + userData[i].lon.toFixed(6) +
-                            "</br> ETref: " + userData[i].etref.toFixed(2) + 
+                        "<td> Lat: " + userData[i].lat.toFixed(6) + "</br> Lon: " + userData[i].lon.toFixed(6) + "</td>" +
+                        "<td> ETref: " + userData[i].etref.toFixed(2) + 
                             "</br> ETcrop: " + userData[i].etcrop.toFixed(2) +
                             "</br> Kcb: " + userData[i].cropCoefficient.toFixed(2) +
                             "</br> CC: " + userData[i].percentCanopyCover.toFixed(1) +
@@ -215,13 +213,18 @@ function dalton(){
 
     //etref = (3.34 + 0.77*windSpeedMean) * vpdMean**0.69; // alfalfa
 
-    M.toast({html: 'Weather is ready!', 'displayLength':2000, inDuration: 500})
+    M.toast({html: 'Weather is ready!', displayLength:2000, inDuration: 500})
 }
+
+function errorweatherapi(){
+    M.toast({html: 'Connection failed.', displayLength:3000, inDuration: 500, classes: 'toast-warning'});
+}
+
 
 function openweathermap(){
     let dt = parseInt(( (new Date().getTime() - 24*60*60*1000) / 1000).toFixed(0));
     let URL = "https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=" + userLocation.latitude + "&lon=" + userLocation.longitude + "&dt=" + dt + "&appid=99fe4ecff5e236e5a687ccc63fd1a7c4";
-    weather = loadJSON(URL, dalton)
+    weather = loadJSON(URL, dalton, errorweatherapi)
 }
 
 
@@ -234,7 +237,7 @@ function updateweather(){
     let distanceChange = haversine(lat1,lon1,lat2,lon2);
 
     if(distanceChange > 2 || timeChange >= 1){
-        M.toast({html: 'Getting new weather', 'displayLength':1500, completeCallback: openweathermap})
+        M.toast({html: 'Getting new weather', displayLength:1500, completeCallback: openweathermap})
     }
 }
 
@@ -375,7 +378,7 @@ function gotFile(file) {
             latitudeContainer.innerText = userLocation.latitude.toFixed(6);
             longitudeContainer.innerText = userLocation.longitude.toFixed(6);
             dateContainer.innerText = currentDateTime.toLocaleDateString();
-            timeContainer.innerText = currentDateTime.toLocaleTimeString();
+            timeContainer.innerText = currentDateTime.toLocaleTimeString('en-US', { hour12: false });
 
             // Update dashboard values
             canopyCoverContainer.innerText = percentCanopyCover.toFixed(1);
@@ -390,6 +393,12 @@ function gotFile(file) {
             // Add dashboard classified image
             dashboardClassifiedImage = createImg(imgClassified.canvas.toDataURL(),'classified image');
             dashboardClassifiedImage.parent('classified-image');
+
+            // Update last user values
+            localStorage.setItem('user-last-latitude', userLocation.latitude);
+            localStorage.setItem('user-last-longitude', userLocation.longitude)
+            localStorage.setItem('user-last-datetime', currentDateTime);
+            localStorage.setItem('user-last-etref', etref);
 
             // Save to local storage
             storeuserdata('user-data',{
