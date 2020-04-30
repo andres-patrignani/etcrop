@@ -23,7 +23,7 @@
         <div class="nav-wrapper">
             <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
            <label class="btn btn-primary" id="camera-btn">Load Image</label>
-           <a class="modal-trigger btn btn-primary" href="#modal-table" id="data-table-btn">Storage</a>
+           <a class="modal-trigger btn btn-primary" href="#modal-table" id="data-table-btn">Recent</a>
             <ul class="right hide-on-med-and-down">
                 <li><a class="modal-trigger" href="#modal-about">About</a></li>
                 <li><a class="modal-trigger" href="#modal-instructions">Instructions</a></li>
@@ -95,7 +95,6 @@
 
 
     <!-- About Modal -->
-
     <div id="modal-about" class="modal">
         <div class="modal-content">
         <h4>About</h4>
@@ -123,6 +122,7 @@
                 <li>Dalton, J., 1802. Experimental essays on the constitution of mixed gases. Manchester Literary and Philosophical Society Memo, 5, pp.535-602.</li>
             </ul>
         </p>
+        <p style="color: dimgrey;">Copyright Andres Patrignani - 2020</p>
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -132,19 +132,28 @@
     <!-- Intructions Modal -->
     <div id="modal-instructions" class="modal">
         <div class="modal-content">
-        <h4>Instructions</h4>
-        <p>
-            Using <i>ETcrop</i> is fairly simple. Just wait few seconds until the web-app has fully loaded (Status: Ready).
-            Then proceed to take a downward-facing image of the crop, make sure you keep the camera lens at least 2 or 3 feet from the top of the canopy. 
-            The web-app will automatically compute the reference evapotranspiration, green canopy cover, crop coefficient, and crop evapotranspiration.
-            The resulting crop evapotranspiration in mm per day will give you an estimate of the irrigation needs. To provide
-            you with more information <i>ETcrop</i> also reports the date, time, and geographic coordinates of each picture.
-            The accuracy of the location depends on the GPS onboard of your mobile device.
-
-            To ensure a better user experience weather data is only retrieved when you open the app or refresh the web browser. 
-            If you move to a new location several miles apart from your initial position, we suggest that you refresh your 
-            browser to obtain weather data from the nearest monitoring station.
-        </p>
+            <h4>Instructions</h4>
+            <div>
+                Using <i>ETcrop</i> is fairly simple: 
+                <ol>
+                    <li>
+                        <b>Step 1: </b>Just wait a second or two until the web-app has fully loaded the weather information for your location.
+                    </li>
+                    </br>
+                    <li>
+                        <b>Step 2: </b>Take a downward-facing image of the crop. Make sure you keep the camera lens at least 2 or 3 feet from the top of the canopy. 
+                    </li>
+                    </br>
+                    <li>
+                        <b>Step 3: </b>The web-app will automatically compute the reference evapotranspiration, green canopy cover, crop coefficient, and crop evapotranspiration.
+                    </li>
+                </ol>
+            </div>
+            <div>
+                The resulting crop evapotranspiration in mm/day gives you an estimate of the current crop water needs. 
+                The ETcrop value can be used to assist you with irrigation . To provide you with more information <i>ETcrop</i> also reports the date, time, and geographic coordinates of each picture.
+                The accuracy of the location depends on the GPS onboard of your mobile device.
+            </div>
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>

@@ -11,7 +11,6 @@ var etref;
 var etcrop;
 var cropCoefficient;
 
-
 var canopyCoverContainer;
 var cropCoefficientContainer;
 var etrefContainer;
@@ -22,7 +21,6 @@ var imageClassifiedContainer;
 var cameraUpload;
 
 function preload() {
-    //stations = loadTable('data/stations.csv','csv','header');
 
     // Get date and time
     currentDateTime = new Date();
@@ -42,13 +40,12 @@ function setup() {
     // Display running version
     console.log('Running etcrop v1.0')
     
-
     // Camera button
     cameraBtn = document.getElementById('camera-btn');
     cameraUpload = createFileInput(gotFile);
     cameraUpload.parent("camera-btn");
     cameraUpload.elt.addEventListener('click', updateweather, true)
-    cameraBtn.children[0].style.display = "none"
+    cameraBtn.children[0].style.display = "none" // prevent display of "Choose file"
 
     // USer data table
     dataTableBtn = document.getElementById('data-table-btn');
@@ -68,10 +65,6 @@ function setup() {
     longitudeContainer = document.getElementById('longitude-value');
     dateContainer = document.getElementById('date-value');
     timeContainer = document.getElementById('time-value');
-
-    //nearestStationNameContainer = document.getElementById('nearest-station-name');
-    //nearestStationDistanceContainer = document.getElementById('nearest-station-distance');
-
     canopyCoverContainer = document.getElementById('canopy-cover-value');
     cropCoefficientContainer = document.getElementById('crop-coefficient-value');
     etrefContainer = document.getElementById("etref-value");
@@ -79,21 +72,16 @@ function setup() {
     imageOriginalContainer = document.getElementById('image-original');
     imageClassifiedContainer = document.getElementById('image-classified');
 
-    //computeStationDistances()
-    //findNearestStation()
-    //requestNearestStationData()
-
     // Set datetime and location dashboard values
     latitudeContainer.innerText = userLocation.latitude.toFixed(6);
     longitudeContainer.innerText = userLocation.longitude.toFixed(6);
     dateContainer.innerText = currentDateTime.toLocaleDateString();
     timeContainer.innerText = currentDateTime.toLocaleTimeString('en-US', { hour12: false });
 
-    //statusContainer.innerText = "Ready"
-    //nearestStationNameContainer.innerText = nearestStationName;
-    //nearestStationDistanceContainer.innerText = Math.round(nearestStationDistance*100)/100;
+    // Display space and time information
     info.style.display = "block";
 
+    // Save to local storage datetime and position data
     localStorage.setItem('user-last-latitude', userLocation.latitude);
     localStorage.setItem('user-last-longitude', userLocation.longitude)
     localStorage.setItem('user-last-datetime', currentDateTime);
@@ -103,60 +91,12 @@ function setup() {
 
 
 // FUNCTIONS
-function computeStationDistances(){
-
-    let N = stations.getRowCount()
-    for(let i=0; i<N; i++){
-        let stationLat = float(stations.getColumn("LATITUDE")[i]);
-        let stationLon = float(stations.getColumn("LONGITUDE")[i]);
-        let userLat = float(userLocation.latitude);
-        let userLon = float(userLocation.longitude);
-        let stationDistance = distance(userLat,userLon,stationLat,stationLon);
-        stations.set(i, 'DISTANCE', stationDistance);
-    }
-    console.log('Done computing distances')
-}
-
-function findNearestStation(){
-    let distances = stations.getColumn("DISTANCE")
-    let idxNearest = distances.indexOf(Math.min(...distances));
-    nearestStationName = stations.get(idxNearest,"NAME");
-    nearestStationDistance = stations.get(idxNearest,"DISTANCE")
-    console.log('Done finding nearest station')
-}
-
-function requestNearestStationData(){
-    let root = "http://mesonet.k-state.edu/rest/stationdata/?"
-
-    let yesterdayDate = new Date(new Date().getTime() - 86400000);
-    let yyyy = yesterdayDate.getFullYear().toString();
-    let mm = yesterdayDate.getMonth() + 1;
-    if(mm<10){
-        mm = "0" + mm.toString();
-    }else{
-        mm = mm.toString();
-    }
-    let dd = yesterdayDate.getDate();
-    if(dd<10){
-        dd = "0" + dd.toString();
-    }else{
-        dd = dd.toString();
-    }
-    let HH = "00"
-    let MM = "00"
-    let SS = "00"
-
-    let startDate = yyyy.toString() + mm + dd + HH + MM + SS;
-    let endDate = startDate;
-    let vars = "TEMP2MMIN,TEMP2MMAX,RELHUM2MMIN,RELHUM2MMAX,WSPD2MAVG,SR"
-
-    let URL = root + 'stn=' + nearestStationName + '&int=day' + '&t_start=' + startDate + '&t_end=' + endDate + "&vars=" + vars;
-    weather = loadTable(URL,'csv','header');
-}
-
+f
 function updatedatatable(){
+    // Clean table before adding new rows
     document.getElementById("data-table").innerHTML = "";
 
+    // If user has metadata from pictures, then display info in a table
     if(localStorage.getItem('user-data')){
         let userData = JSON.parse(localStorage.getItem('user-data'));
         createElement('tr', "<th>DateTime</th><th>Position</th><th>Metrics</th>").parent('data-table');
@@ -164,7 +104,7 @@ function updatedatatable(){
         for(let i=userData.length-1; i>=0; i--){
             let rowDate = new Date(userData[i].datetime);
             createElement('tr',
-                        "<td> Date: " + rowDate.toLocaleDateString() + "</br> Time: " + rowDate.toLocaleTimeString() + "</td>" +
+                        "<td> Date: " + rowDate.toLocaleDateString() + "</br> Time: " + rowDate.toLocaleTimeString('en-US', { hour12: false }) + "</td>" +
                         "<td> Lat: " + userData[i].lat.toFixed(6) + "</br> Lon: " + userData[i].lon.toFixed(6) + "</td>" +
                         "<td> ETref: " + userData[i].etref.toFixed(2) + 
                             "</br> ETcrop: " + userData[i].etcrop.toFixed(2) +
@@ -172,13 +112,18 @@ function updatedatatable(){
                             "</br> CC: " + userData[i].percentCanopyCover.toFixed(1) +
                         "</td>").parent('data-table');
         }
+    
+    // If user does not have any data on storage, then display placeholder
     } else {
-        createElement('div',"No data available. Take some pictures.").parent('data-table');
+        createElement('div',"No data available.").parent('data-table');
     }
 }
 
 function dalton(){
-    // Proposed by Dalton in 1802
+    // Model proposed by Dalton in 1802
+
+    // If we are here is because weather data retrieval was successful
+    M.toast({html: 'Weather is ready!', displayLength:2000, inDuration: 500})
 
     // Compute sum of weather variables
     let windSpeedSum = 0;
@@ -210,11 +155,9 @@ function dalton(){
     etref = (2.98 + 0.38*windSpeedMean) * vpdMean**0.69; // grass
     etref = Math.min(etref, 18);
     etref = Math.max(etref, 0.15);
-
     //etref = (3.34 + 0.77*windSpeedMean) * vpdMean**0.69; // alfalfa
-
-    M.toast({html: 'Weather is ready!', displayLength:2000, inDuration: 500})
 }
+
 
 function errorweatherapi(){
     M.toast({html: 'Connection failed.', displayLength:3000, inDuration: 500, classes: 'toast-warning'});
@@ -264,7 +207,7 @@ function etcropfn(cc){
 
 
 function haversine(lat1,lon1,lat2,lon2) {
-    // convert degrees to radians
+    // Compute delta degrees and convert to radians
     let dLat = (lat2 - lat1) * Math.PI / 180;  
     let dLon = (lon2 - lon1) * Math.PI / 180;  
 
@@ -427,3 +370,57 @@ function gotFile(file) {
         alert("The selected file is not supported. Please load an image in .JPG or .PNG format")
         }
 }
+
+
+
+
+// OLD FUNCTIONS
+// function computeStationDistances(){
+//     let N = stations.getRowCount()
+//     for(let i=0; i<N; i++){
+//         let stationLat = float(stations.getColumn("LATITUDE")[i]);
+//         let stationLon = float(stations.getColumn("LONGITUDE")[i]);
+//         let userLat = float(userLocation.latitude);
+//         let userLon = float(userLocation.longitude);
+//         let stationDistance = distance(userLat,userLon,stationLat,stationLon);
+//         stations.set(i, 'DISTANCE', stationDistance);
+//     }
+//     console.log('Done computing distances')
+// }
+
+// function findNearestStation(){
+//     let distances = stations.getColumn("DISTANCE")
+//     let idxNearest = distances.indexOf(Math.min(...distances));
+//     nearestStationName = stations.get(idxNearest,"NAME");
+//     nearestStationDistance = stations.get(idxNearest,"DISTANCE")
+//     console.log('Done finding nearest station')
+// }
+
+// function requestNearestStationData(){
+//     let root = "http://mesonet.k-state.edu/rest/stationdata/?"
+
+//     let yesterdayDate = new Date(new Date().getTime() - 86400000);
+//     let yyyy = yesterdayDate.getFullYear().toString();
+//     let mm = yesterdayDate.getMonth() + 1;
+//     if(mm<10){
+//         mm = "0" + mm.toString();
+//     }else{
+//         mm = mm.toString();
+//     }
+//     let dd = yesterdayDate.getDate();
+//     if(dd<10){
+//         dd = "0" + dd.toString();
+//     }else{
+//         dd = dd.toString();
+//     }
+//     let HH = "00"
+//     let MM = "00"
+//     let SS = "00"
+
+//     let startDate = yyyy.toString() + mm + dd + HH + MM + SS;
+//     let endDate = startDate;
+//     let vars = "TEMP2MMIN,TEMP2MMAX,RELHUM2MMIN,RELHUM2MMAX,WSPD2MAVG,SR"
+
+//     let URL = root + 'stn=' + nearestStationName + '&int=day' + '&t_start=' + startDate + '&t_end=' + endDate + "&vars=" + vars;
+//     weather = loadTable(URL,'csv','header');
+// }
