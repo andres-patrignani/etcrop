@@ -91,7 +91,6 @@ function setup() {
 
 
 // FUNCTIONS
-f
 function updatedatatable(){
     // Clean table before adding new rows
     document.getElementById("data-table").innerHTML = "";
